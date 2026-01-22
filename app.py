@@ -43,7 +43,7 @@ class Playlist(db.Model):
     name = db.Column(db.String(100))
     songs = db.relationship("Song", secondary=playlist_songs, backref="playlists")
 
-# ✅ FIX: app context
+
 with app.app_context():
     db.create_all()
 
@@ -152,6 +152,10 @@ def remove_song(pid, sid):
 @app.route("/music/<path:filename>")
 def serve_music(filename):
     return send_from_directory(MUSIC_FOLDER, filename)
+
+@app.route("/")
+def home():
+    return {"status": "API is running"}
 
 if __name__ == "__main__":
     app.run(debug=True)

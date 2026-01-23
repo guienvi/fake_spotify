@@ -15,7 +15,7 @@ os.makedirs(COVER_FOLDER, exist_ok=True)
 
 ALLOWED = (".mp3", ".m4a")
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder="static")
 CORS(app)
 
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///music.db"
@@ -101,6 +101,7 @@ def get_songs():
             "title": s.title,
             "artist": s.artist,
             "file": s.filename,
+            "filename": s.filename,
             "cover": s.cover
         } for s in Song.query.all()
     ])

@@ -50,18 +50,19 @@ with app.app_context():
 # ---------- METADATA ----------
 
 def extract_metadata(path):
-    audio = File(path)
     title = os.path.splitext(os.path.basename(path))[0]
     artist = "Unknown"
     cover = "default.jpg"
 
-    if audio:
-        if "TIT2" in audio:
-            title = audio["TIT2"].text[0]
-        if "TPE1" in audio:
-            artist = audio["TPE1"].text[0]
+    try:
+        audio = File(path)
+        if not audio:
+            return title, artist, cover
 
         if audio.tags:
+            title = audio.tags.get("TIT2", [title])[0]
+            artist = audio.tags.get("TPE1", [artist])[0]
+
             for tag in audio.tags.values():
                 if hasattr(tag, "FrameID") and tag.FrameID == "APIC":
                     img = Image.open(BytesIO(tag.data))
@@ -76,7 +77,11 @@ def extract_metadata(path):
                 img.save(os.path.join(COVER_FOLDER, name))
                 cover = name
 
+    except Exception as e:
+        print("Metadata error:", e)
+
     return title, artist, cover
+
 
 # ---------- SYNC MUSIC ----------
 
